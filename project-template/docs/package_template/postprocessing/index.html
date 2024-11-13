@@ -32,8 +32,361 @@ hljs.highlightAll();
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="package_template.postprocessing.format_output_result"><code class="name flex">
+<span>def <span class="ident">format_output_result</span></span>(<span>df: pyspark.sql.dataframe.DataFrame, output_format: str, dict_key: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Transform output format into "json", "dict", or "dataframe"</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>df</code></strong> :&ensp;<code>pyspark.sql.DataFrame. The recommendation result</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>output_format</code></strong> :&ensp;<code>str. The output format. Should be "json", "dict",</code> or <code>"dataframe"</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>dict_key</code></strong> :&ensp;<code>str. The column name in df that will be used as dictionary key</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>The formatted recommendation result</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+</dd>
+</dl>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="package_template.postprocessing.ScoreNormalization"><code class="flex name class">
+<span>class <span class="ident">ScoreNormalization</span></span>
+<span>(</span><span>group_col: str, rec_col: str, score_col: str, transformation_method: str = 'log', low_threshold: float = -inf, high_threshold: float = inf, output_format: str = 'json', provide_score: bool = False, verbosity_level: int = 1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This class is used to transformed and normalized the score distribution
+of our recommendation results.</p>
+<p>Initialize the parameters.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>group_col</code></strong> :&ensp;<code>str</code></dt>
+<dd>Provide the name of the item column.</dd>
+<dt><strong><code>rec_col</code></strong> :&ensp;<code>str</code></dt>
+<dd>Provide the name of the recommendation column.</dd>
+<dt><strong><code>score_col</code></strong> :&ensp;<code>str</code></dt>
+<dd>Provide the name of the score column.</dd>
+<dt><strong><code>transformation_method</code></strong> :&ensp;<code>str = 'log'</code></dt>
+<dd>Provide the way to do transformation.</dd>
+<dt><strong><code>low_threshold</code></strong> :&ensp;<code>float = -inf</code></dt>
+<dd>Provide the low threshold after transformation. All the values smaller
+than low_threshold will be removed.</dd>
+<dt><strong><code>high_threshold</code></strong> :&ensp;<code>float = inf</code></dt>
+<dd>Provide the high threshold after transformation. All the values higher
+than high_threshold will be capped at high_threshold.</dd>
+<dt><strong><code>output_format</code></strong> :&ensp;<code>str</code>, default <code>= 'json'</code></dt>
+<dd>Provide the format of output, can be 'dataframe', 'json'.</dd>
+<dt><strong><code>provide_score</code></strong> :&ensp;<code>bool</code>, default <code>= False</code></dt>
+<dd>If True, output scores of each recommended item.</dd>
+<dt><strong><code>verbosity_level</code></strong> :&ensp;<code>int</code>, default=<code>1</code></dt>
+<dd>an int parameter to control the log information
+only log running time when verbosity_level is 1</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; from pyspark.sql import SparkSession
+&gt;&gt;&gt; from pyspark_recommender.postprocessing import ScoreNormalization
+&gt;&gt;&gt; spark = SparkSession.builder.appName(&quot;test_normalization&quot;).getOrCreate()
+&gt;&gt;&gt; item_attributes = [
+...         &quot;item_id&quot;,
+...         &quot;recommendation&quot;,
+...         &quot;score&quot;,
+...     ]
+&gt;&gt;&gt; rec = [[&quot;item1&quot;, [&quot;item2&quot;, &quot;item3&quot;, &quot;item4&quot;], [5, 3, 2]],
+... [&quot;item2&quot;, [&quot;item4&quot;, &quot;item5&quot;, &quot;item2&quot;], [4, 2, 1]]]
+&gt;&gt;&gt; rec_df = spark.createDataFrame(rec, item_attributes)
+&gt;&gt;&gt; score_transformation = ScoreNormalization(
+...             group_col=&quot;item_id&quot;,
+...             rec_col=&quot;recommendation&quot;,
+...             score_col=&quot;score&quot;,
+...             output_format=&quot;dataframe&quot;,
+...             provide_score=True,
+...         ).transform(rec_df)
+&gt;&gt;&gt; score_transformation.show(truncate=False)
++-------+---------------------+----------------------------+
+|item_id|recommendation       |score                       |
++-------+---------------------+----------------------------+
+|item1  |[item2, item3, item4]|[1.0, 0.6826062, 0.43067655]|
+|item2  |[item4, item5, item2]|[0.8613531, 0.43067655, 0.0]|
++-------+---------------------+----------------------------+
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ScoreNormalization(Transformer):
+    &#34;&#34;&#34;
+    This class is used to transformed and normalized the score distribution
+    of our recommendation results.
+    &#34;&#34;&#34;
+
+    group_col = Param(
+        Params._dummy(), &#34;group_col&#34;, &#34;Provide the name of the item column.&#34;
+    )
+    rec_col = Param(
+        Params._dummy(), &#34;rec_col&#34;, &#34;Provide the name of the recommendation column.&#34;
+    )
+    score_col = Param(
+        Params._dummy(), &#34;score_col&#34;, &#34;Provide the name of the score column.&#34;
+    )
+    transformation_method = Param(
+        Params._dummy(), &#34;transformation_method&#34;, &#34;Provide method to do transformation.&#34;
+    )
+    low_threshold = Param(Params._dummy(), &#34;low_threshold&#34;, &#34;Provide low threshold.&#34;)
+    high_threshold = Param(Params._dummy(), &#34;high_threshold&#34;, &#34;Provide high threshold.&#34;)
+    output_format = Param(
+        Params._dummy(),
+        &#34;output_format&#34;,
+        &#34;Provide the format of output, can be &#39;dataframe&#39;, &#39;json&#39;.&#34;,
+    )
+    provide_score = Param(
+        Params._dummy(),
+        &#34;provide_score&#34;,
+        &#34;If True, output scores of each recommended item.&#34;,
+    )
+    verbosity_level = Param(
+        Params._dummy(),
+        &#34;verbosity_level&#34;,
+        &#34;verbosity_level to control logger&#34;,
+    )
+
+    # Initialize parameters
+    @keyword_only
+    @logger
+    def __init__(
+        self,
+        group_col: str,
+        rec_col: str,
+        score_col: str,
+        transformation_method: str = &#34;log&#34;,
+        low_threshold: float = float(&#34;-inf&#34;),
+        high_threshold: float = float(&#34;inf&#34;),
+        output_format: str = &#34;json&#34;,
+        provide_score: bool = False,
+        verbosity_level: int = 1,
+    ):
+        &#34;&#34;&#34;
+        Initialize the parameters.
+
+        Parameters
+        ----------
+        group_col: str
+            Provide the name of the item column.
+        rec_col: str
+            Provide the name of the recommendation column.
+        score_col: str
+            Provide the name of the score column.
+        transformation_method: str = &#39;log&#39;
+            Provide the way to do transformation.
+        low_threshold: float = -inf
+            Provide the low threshold after transformation. All the values smaller
+            than low_threshold will be removed.
+        high_threshold: float = inf
+            Provide the high threshold after transformation. All the values higher
+            than high_threshold will be capped at high_threshold.
+        output_format: str, default = &#39;json&#39;
+            Provide the format of output, can be &#39;dataframe&#39;, &#39;json&#39;.
+        provide_score: bool, default = False
+            If True, output scores of each recommended item.
+        verbosity_level: int, default=1
+            an int parameter to control the log information
+            only log running time when verbosity_level is 1
+
+        Example
+        -------
+        &gt;&gt;&gt; from pyspark.sql import SparkSession
+        &gt;&gt;&gt; from pyspark_recommender.postprocessing import ScoreNormalization
+        &gt;&gt;&gt; spark = SparkSession.builder.appName(&#34;test_normalization&#34;).getOrCreate()
+        &gt;&gt;&gt; item_attributes = [
+        ...         &#34;item_id&#34;,
+        ...         &#34;recommendation&#34;,
+        ...         &#34;score&#34;,
+        ...     ]
+        &gt;&gt;&gt; rec = [[&#34;item1&#34;, [&#34;item2&#34;, &#34;item3&#34;, &#34;item4&#34;], [5, 3, 2]],
+        ... [&#34;item2&#34;, [&#34;item4&#34;, &#34;item5&#34;, &#34;item2&#34;], [4, 2, 1]]]
+        &gt;&gt;&gt; rec_df = spark.createDataFrame(rec, item_attributes)
+        &gt;&gt;&gt; score_transformation = ScoreNormalization(
+        ...             group_col=&#34;item_id&#34;,
+        ...             rec_col=&#34;recommendation&#34;,
+        ...             score_col=&#34;score&#34;,
+        ...             output_format=&#34;dataframe&#34;,
+        ...             provide_score=True,
+        ...         ).transform(rec_df)
+        &gt;&gt;&gt; score_transformation.show(truncate=False)
+        +-------+---------------------+----------------------------+
+        |item_id|recommendation       |score                       |
+        +-------+---------------------+----------------------------+
+        |item1  |[item2, item3, item4]|[1.0, 0.6826062, 0.43067655]|
+        |item2  |[item4, item5, item2]|[0.8613531, 0.43067655, 0.0]|
+        +-------+---------------------+----------------------------+
+        &#34;&#34;&#34;
+        super(ScoreNormalization, self).__init__()
+        self._setDefault(output_format=&#34;json&#34;)
+        self._setDefault(provide_score=False)
+        self._setDefault(transformation_method=&#34;log&#34;)
+        self._setDefault(low_threshold=float(&#34;-inf&#34;))
+        self._setDefault(high_threshold=float(&#34;inf&#34;))
+        self._setDefault(verbosity_level=1)
+        kwargs = self._input_kwargs
+        self._set(**kwargs)
+
+    @logger
+    def _transform(self, data):
+        &#34;&#34;&#34;
+        This function transforms the score columns based
+        on the transformation rules.
+
+        Parameters
+        ----------
+        data: spark.sql.Dataframe
+            Provide the recommendation dataframe.
+
+        Returns
+        -------
+        result: spark.sql.Dataframe or json
+            Provide the transformed recommendation dataframe
+            or transformed data in json format
+        &#34;&#34;&#34;
+        group_col = self.getOrDefault(&#34;group_col&#34;)
+        rec_col = self.getOrDefault(&#34;rec_col&#34;)
+        score_col = self.getOrDefault(&#34;score_col&#34;)
+        transformation_method = self.getOrDefault(&#34;transformation_method&#34;)
+        low_threshold = self.getOrDefault(&#34;low_threshold&#34;)
+        high_threshold = self.getOrDefault(&#34;high_threshold&#34;)
+        output_format = self.getOrDefault(&#34;output_format&#34;)
+        provide_score = self.getOrDefault(&#34;provide_score&#34;)
+        # assertions for params
+        assert group_col in data.columns, &#34;data must have the given group_col&#34;
+        assert rec_col in data.columns, &#34;data must have the given rec_col&#34;
+        assert score_col in data.columns, &#34;data must have the given score_col&#34;
+        assert output_format in [
+            &#34;dataframe&#34;,
+            &#34;json&#34;,
+            &#34;dict&#34;,
+        ], &#34;output_format should be &#39;dataframe&#39;, &#39;dict&#39;, or &#39;json&#39;&#34;
+        assert isinstance(provide_score, bool), &#34;provide_score must be bool&#34;
+        assert transformation_method in [
+            &#34;log&#34;,
+        ], &#34;transformation method should be &#39;log&#39;&#34;
+        assert isinstance(low_threshold, float), &#34;low_threshold must be float&#34;
+        assert isinstance(high_threshold, float), &#34;high_threshold must be float&#34;
+
+        # Define UDF to do transformation and filtering
+        def transformation_filtering(rec_item, rec_score):
+            # Transform the recommendation score
+            if transformation_method == &#34;log&#34;:
+                result_item, result_score = [], []
+                for item, score in list(zip(rec_item, rec_score)):
+                    # Calculate the log transformation score
+                    temp = math.log(score)
+                    # Cap at the high threshold
+                    if temp &gt; high_threshold:
+                        result_item.append(item)
+                        result_score.append(high_threshold)
+                    # Keep value without change
+                    elif temp &gt;= low_threshold:
+                        result_item.append(item)
+                        result_score.append(temp)
+                    # Remove left tail if score smaller than low threshold
+                    else:
+                        continue
+                return result_item, result_score
+
+        # Define and Call the UDF
+        schema = StructType(
+            [
+                StructField(&#34;rec_item&#34;, ArrayType(StringType()), False),
+                StructField(&#34;rec_score&#34;, ArrayType(FloatType()), False),
+            ]
+        )
+        transformation_filtering_udf = F.udf(transformation_filtering, schema)
+        df_transform = data.withColumn(
+            &#34;transform&#34;, transformation_filtering_udf(F.col(rec_col), F.col(score_col))
+        ).select(group_col, &#34;transform.rec_item&#34;, &#34;transform.rec_score&#34;)
+
+        # Get the largest and smallest value from recommendation score
+        df = df_transform.select(
+            F.col(&#34;rec_score&#34;)[0].alias(&#34;largest_score&#34;),
+            F.element_at(F.col(&#34;rec_score&#34;), -1).alias(&#34;smallest_score&#34;),
+        )
+        min_val, max_val = df.select(
+            F.min(&#34;smallest_score&#34;), F.max(&#34;largest_score&#34;)
+        ).first()
+
+        # Normalize the transformed score
+        def normalization(score):
+            for idx, num in enumerate(score):
+                score[idx] = (num - min_val) / (max_val - min_val)
+            return score
+
+        normalization_udf = F.udf(normalization, ArrayType(FloatType()))
+
+        # Select and rename column names
+        result_df = (
+            df_transform.withColumn(score_col, normalization_udf(F.col(&#34;rec_score&#34;)))
+            .drop(&#34;rec_score&#34;)
+            .withColumnRenamed(&#34;rec_item&#34;, rec_col)
+        )
+        # Change the output format
+        return format_output_result(
+            df=result_df, output_format=output_format, dict_key=group_col
+        )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>pyspark.ml.base.Transformer</li>
+<li>pyspark.ml.param.Params</li>
+<li>pyspark.ml.util.Identifiable</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="package_template.postprocessing.ScoreNormalization.group_col"><code class="name">var <span class="ident">group_col</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="package_template.postprocessing.ScoreNormalization.high_threshold"><code class="name">var <span class="ident">high_threshold</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="package_template.postprocessing.ScoreNormalization.low_threshold"><code class="name">var <span class="ident">low_threshold</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="package_template.postprocessing.ScoreNormalization.output_format"><code class="name">var <span class="ident">output_format</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="package_template.postprocessing.ScoreNormalization.provide_score"><code class="name">var <span class="ident">provide_score</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="package_template.postprocessing.ScoreNormalization.rec_col"><code class="name">var <span class="ident">rec_col</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="package_template.postprocessing.ScoreNormalization.score_col"><code class="name">var <span class="ident">score_col</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="package_template.postprocessing.ScoreNormalization.transformation_method"><code class="name">var <span class="ident">transformation_method</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="package_template.postprocessing.ScoreNormalization.verbosity_level"><code class="name">var <span class="ident">verbosity_level</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -44,6 +397,29 @@ hljs.highlightAll();
 <li><h3>Super-module</h3>
 <ul>
 <li><code><a title="package_template" href="../index.html">package_template</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="package_template.postprocessing.format_output_result" href="#package_template.postprocessing.format_output_result">format_output_result</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="package_template.postprocessing.ScoreNormalization" href="#package_template.postprocessing.ScoreNormalization">ScoreNormalization</a></code></h4>
+<ul class="">
+<li><code><a title="package_template.postprocessing.ScoreNormalization.group_col" href="#package_template.postprocessing.ScoreNormalization.group_col">group_col</a></code></li>
+<li><code><a title="package_template.postprocessing.ScoreNormalization.high_threshold" href="#package_template.postprocessing.ScoreNormalization.high_threshold">high_threshold</a></code></li>
+<li><code><a title="package_template.postprocessing.ScoreNormalization.low_threshold" href="#package_template.postprocessing.ScoreNormalization.low_threshold">low_threshold</a></code></li>
+<li><code><a title="package_template.postprocessing.ScoreNormalization.output_format" href="#package_template.postprocessing.ScoreNormalization.output_format">output_format</a></code></li>
+<li><code><a title="package_template.postprocessing.ScoreNormalization.provide_score" href="#package_template.postprocessing.ScoreNormalization.provide_score">provide_score</a></code></li>
+<li><code><a title="package_template.postprocessing.ScoreNormalization.rec_col" href="#package_template.postprocessing.ScoreNormalization.rec_col">rec_col</a></code></li>
+<li><code><a title="package_template.postprocessing.ScoreNormalization.score_col" href="#package_template.postprocessing.ScoreNormalization.score_col">score_col</a></code></li>
+<li><code><a title="package_template.postprocessing.ScoreNormalization.transformation_method" href="#package_template.postprocessing.ScoreNormalization.transformation_method">transformation_method</a></code></li>
+<li><code><a title="package_template.postprocessing.ScoreNormalization.verbosity_level" href="#package_template.postprocessing.ScoreNormalization.verbosity_level">verbosity_level</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

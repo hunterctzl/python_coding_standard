@@ -34,6 +34,438 @@ hljs.highlightAll();
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="package_template.models.AssociationRuleModel"><code class="flex name class">
+<span>class <span class="ident">AssociationRuleModel</span></span>
+<span>(</span><span>item_list_col: str, min_support: float = 0.002, min_confidence: float = 0.2, min_lift: float = 1.2, candidate_count: int = 50, target_item: int = None, item_col: str = 'item_id', rec_col: str = 'recommendations', score_col: str = 'score', provide_score: bool = False, output_format: str = 'json', num_limit_in_cart: int = 20, verbosity_level: int = 1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Provide Association Rule model to provide recommendations
+for purchased together.</p>
+<p>initialize parameters</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>item_list_col</code></strong> :&ensp;<code>str</code></dt>
+<dd>Provide the name of the column of list of item ID.
+e.g. item_list_col = "shopping_list"</dd>
+<dt><strong><code>min_support</code></strong> :&ensp;<code>float</code>, default <code>= 0.002</code></dt>
+<dd>the minimum support for an itemset to be identified as frequent.
+For example, if an item appears 3 out of 5 transactions,
+it has a support of 3/5=0.6.
+e.g. min_support = 0.002</dd>
+<dt><strong><code>min_confidence</code></strong> :&ensp;<code>float</code>, default <code>= 0.2</code></dt>
+<dd>minimum confidence for generating Association Rule.
+Confidence is an indication of how often an association rule
+has been found to be true.
+For example, if in the transactions itemset X appears 4 times,
+X and Y co-occur only 2 times,
+the confidence for the rule X =&gt; Y is then 2/4 = 0.5.
+The parameter will not affect the mining for frequent itemsets,
+but specify the minimum confidence for
+generating association rules from frequent itemsets.</dd>
+<dt><strong><code>min_lift</code></strong> :&ensp;<code>float</code>, default <code>= 1.2</code></dt>
+<dd>minimum lift for generating Association Rule.
+lift is the rise in probability of having {Y} on the
+cart with the knowledge of {X} being present over the
+probability of having {Y} on the cart
+without any knowledge about presence of {X}
+Lift(X&ndash;&gt;Y) = support(X U Y) / support(X).support(Y)</dd>
+<dt><strong><code>candidate_count</code></strong> :&ensp;<code>int</code>, default <code>= 10</code></dt>
+<dd>number of top candidates</dd>
+<dt><strong><code>target_item</code></strong> :&ensp;<code>int</code> or <code>str</code>, default <code>= None</code></dt>
+<dd>Specify if want prediction for a single item.</dd>
+<dt><strong><code>item_col</code></strong> :&ensp;<code>str</code>, default <code>= "item_id"</code></dt>
+<dd>filed name for item in the output.</dd>
+<dt><strong><code>rec_col</code></strong> :&ensp;<code>str</code>, default <code>= "recommendations"</code></dt>
+<dd>filed name for recommendations in the output.</dd>
+<dt><strong><code>score_col</code></strong> :&ensp;<code>str</code>, default <code>= "score"</code></dt>
+<dd>filed name for score in the output.</dd>
+<dt><strong><code>provide_score</code></strong> :&ensp;<code>bool</code>, default <code>= False</code></dt>
+<dd>Set to True if desire score in the output.</dd>
+<dt><strong><code>output_format</code></strong> :&ensp;<code>str， default = "json"</code></dt>
+<dd>Declare Output format.("json", "dataframe")</dd>
+<dt><strong><code>num_limit_in_cart</code></strong> :&ensp;<code>int</code>, default <code>= 20</code></dt>
+<dd>Item limit number in each shopping cart. If this value too big, the fit will
+be very slow.</dd>
+<dt><strong><code>verbosity_level</code></strong> :&ensp;<code>int</code>, default=<code>1</code></dt>
+<dd>an int parameter to control the log information
+only log running time when verbosity_level is 1</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; from pyspark.sql import SparkSession
+&gt;&gt;&gt; from package_template.models import AssociationRuleModel
+&gt;&gt;&gt; spark = SparkSession.builder.appName(&quot;test_association_rule&quot;).getOrCreate()
+&gt;&gt;&gt; df = spark.createDataFrame(
+&gt;&gt;&gt; pd.DataFrame(
+...         [
+...         (6, [&quot;B&quot;, &quot;A&quot;]),
+...         (5, [&quot;B&quot;, &quot;A&quot;]),
+...         (1, [&quot;C&quot;, &quot;B&quot;, &quot;A&quot;]),
+...         (3, [&quot;C&quot;, &quot;A&quot;]),
+...         (2, [&quot;B&quot;, &quot;A&quot;]),
+...        (4, [&quot;C&quot;, &quot;E&quot;, &quot;D&quot;]),
+...     ],
+...     columns=[&quot;trans_key&quot;, &quot;shopping_list&quot;],
+...   )
+... )
+&gt;&gt;&gt; model = AssociationRuleModel(
+...        item_list_col=&quot;shopping_list&quot;,
+...        min_support=0.2,
+...        min_confidence=0.2,
+...        min_lift = 0.5,
+...        provide_score=True,
+...        candidate_count=3,
+...    )
+&gt;&gt;&gt; result = model.fit(self.df).transform(self.df)
+&gt;&gt;&gt; print(result)
+{&quot;item_id&quot;: &quot;B&quot;, &quot;recommendations&quot;: [&quot;A&quot;], &quot;score&quot;: [1.2]},
+{&quot;item_id&quot;: &quot;C&quot;, &quot;recommendations&quot;: [&quot;A&quot;], &quot;score&quot;: [0.7999999999999999]},
+{
+        &quot;item_id&quot;: &quot;A&quot;,
+        &quot;recommendations&quot;: [&quot;B&quot;, &quot;C&quot;],
+        &quot;score&quot;: [1.2000000000000002, 0.8],
+}
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AssociationRuleModel(Estimator):
+    &#34;&#34;&#34;
+    Provide Association Rule model to provide recommendations
+    for purchased together.
+    &#34;&#34;&#34;
+
+    # use Param function to define parameters
+    item_list_col = Param(
+        Params._dummy(),
+        &#34;item_list_col&#34;,
+        &#34;Provide the name of the column of list of item ID.&#34;,
+    )
+    min_support = Param(
+        Params._dummy(),
+        &#34;min_support&#34;,
+        &#34;Provide the minimum support&#34;,
+    )
+    min_confidence = Param(
+        Params._dummy(),
+        &#34;min_confidence&#34;,
+        &#34;Provide the minimum confidence&#34;,
+    )
+    min_lift = Param(
+        Params._dummy(),
+        &#34;min_lift&#34;,
+        &#34;Provide the minimum lift&#34;,
+    )
+    candidate_count = Param(
+        Params._dummy(), &#34;candidate_count&#34;, &#34;number of top candidates&#34;
+    )
+    target_item = Param(
+        Params._dummy(), &#34;target_item&#34;, &#34;Specify if want prediction for a single item&#34;
+    )
+    item_col = Param(
+        Params._dummy(),
+        &#34;item_col&#34;,
+        &#34;filed name for item in the output.&#34;,
+    )
+    rec_col = Param(
+        Params._dummy(),
+        &#34;rec_col&#34;,
+        &#34;filed name for recommendations in the output.&#34;,
+    )
+    score_col = Param(
+        Params._dummy(),
+        &#34;score_col&#34;,
+        &#34;filed name for score in the output.&#34;,
+    )
+    provide_score = Param(
+        Params._dummy(),
+        &#34;provide_score&#34;,
+        &#34;Set to True if desire score in the output.&#34;,
+    )
+    output_format = Param(
+        Params._dummy(),
+        &#34;output_format&#34;,
+        &#34;Declare Output format.(&#39;json&#39;, &#39;dataframe&#39;)&#34;,
+    )
+
+    num_limit_in_cart = Param(
+        Params._dummy(),
+        &#34;num_limit_in_cart&#34;,
+        &#34;Declare the item limit number in each shopping cart.&#34;,
+    )
+    verbosity_level = Param(
+        Params._dummy(),
+        &#34;verbosity_level&#34;,
+        &#34;verbosity_level to control logger&#34;,
+    )
+
+    @keyword_only
+    @logger
+    def __init__(
+        self,
+        item_list_col: str,
+        min_support: float = 0.002,
+        min_confidence: float = 0.2,
+        min_lift: float = 1.2,
+        candidate_count: int = 50,
+        target_item: int or str = None,
+        item_col: str = &#34;item_id&#34;,
+        rec_col: str = &#34;recommendations&#34;,
+        score_col: str = &#34;score&#34;,
+        provide_score: bool = False,
+        output_format: str = &#34;json&#34;,
+        num_limit_in_cart: int = 20,
+        verbosity_level: int = 1,
+    ):
+        &#34;&#34;&#34;
+        initialize parameters
+
+        Parameters
+        ----------
+        item_list_col: str
+            Provide the name of the column of list of item ID.
+            e.g. item_list_col = &#34;shopping_list&#34;
+        min_support: float, default = 0.002
+            the minimum support for an itemset to be identified as frequent.
+            For example, if an item appears 3 out of 5 transactions,
+            it has a support of 3/5=0.6.
+            e.g. min_support = 0.002
+        min_confidence: float, default = 0.2
+            minimum confidence for generating Association Rule.
+            Confidence is an indication of how often an association rule
+            has been found to be true.
+            For example, if in the transactions itemset X appears 4 times,
+            X and Y co-occur only 2 times,
+            the confidence for the rule X =&gt; Y is then 2/4 = 0.5.
+            The parameter will not affect the mining for frequent itemsets,
+            but specify the minimum confidence for
+            generating association rules from frequent itemsets.
+        min_lift: float, default = 1.2
+            minimum lift for generating Association Rule.
+            lift is the rise in probability of having {Y} on the
+            cart with the knowledge of {X} being present over the
+            probability of having {Y} on the cart
+            without any knowledge about presence of {X}
+            Lift(X--&gt;Y) = support(X U Y) / support(X).support(Y)
+        candidate_count: int, default = 10
+            number of top candidates
+        target_item: int or str, default = None
+            Specify if want prediction for a single item.
+        item_col: str, default = &#34;item_id&#34;
+            filed name for item in the output.
+        rec_col: str, default = &#34;recommendations&#34;
+            filed name for recommendations in the output.
+        score_col: str, default = &#34;score&#34;
+            filed name for score in the output.
+        provide_score: bool, default = False
+            Set to True if desire score in the output.
+        output_format: str， default = &#34;json&#34;
+            Declare Output format.(&#34;json&#34;, &#34;dataframe&#34;)
+        num_limit_in_cart: int, default = 20
+            Item limit number in each shopping cart. If this value too big, the fit will
+            be very slow.
+        verbosity_level: int, default=1
+            an int parameter to control the log information
+            only log running time when verbosity_level is 1
+
+        Example
+        -------
+        &gt;&gt;&gt; from pyspark.sql import SparkSession
+        &gt;&gt;&gt; from package_template.models import AssociationRuleModel
+        &gt;&gt;&gt; spark = SparkSession.builder.appName(&#34;test_association_rule&#34;).getOrCreate()
+        &gt;&gt;&gt; df = spark.createDataFrame(
+        &gt;&gt;&gt; pd.DataFrame(
+        ...         [
+        ...         (6, [&#34;B&#34;, &#34;A&#34;]),
+        ...         (5, [&#34;B&#34;, &#34;A&#34;]),
+        ...         (1, [&#34;C&#34;, &#34;B&#34;, &#34;A&#34;]),
+        ...         (3, [&#34;C&#34;, &#34;A&#34;]),
+        ...         (2, [&#34;B&#34;, &#34;A&#34;]),
+        ...        (4, [&#34;C&#34;, &#34;E&#34;, &#34;D&#34;]),
+        ...     ],
+        ...     columns=[&#34;trans_key&#34;, &#34;shopping_list&#34;],
+        ...   )
+        ... )
+        &gt;&gt;&gt; model = AssociationRuleModel(
+        ...        item_list_col=&#34;shopping_list&#34;,
+        ...        min_support=0.2,
+        ...        min_confidence=0.2,
+        ...        min_lift = 0.5,
+        ...        provide_score=True,
+        ...        candidate_count=3,
+        ...    )
+        &gt;&gt;&gt; result = model.fit(self.df).transform(self.df)
+        &gt;&gt;&gt; print(result)
+        {&#34;item_id&#34;: &#34;B&#34;, &#34;recommendations&#34;: [&#34;A&#34;], &#34;score&#34;: [1.2]},
+        {&#34;item_id&#34;: &#34;C&#34;, &#34;recommendations&#34;: [&#34;A&#34;], &#34;score&#34;: [0.7999999999999999]},
+        {
+                &#34;item_id&#34;: &#34;A&#34;,
+                &#34;recommendations&#34;: [&#34;B&#34;, &#34;C&#34;],
+                &#34;score&#34;: [1.2000000000000002, 0.8],
+        }
+        &#34;&#34;&#34;
+        super(AssociationRuleModel, self).__init__()
+
+        self._setDefault(min_support=0.002)
+        self._setDefault(min_confidence=0.2)
+        self._setDefault(min_lift=1.2)
+        self._setDefault(candidate_count=5)
+        self._setDefault(target_item=None)
+        self._setDefault(item_col=&#34;item_id&#34;)
+        self._setDefault(rec_col=&#34;recommendations&#34;)
+        self._setDefault(score_col=&#34;score&#34;)
+        self._setDefault(provide_score=False)
+        self._setDefault(output_format=&#34;json&#34;)
+        self._setDefault(num_limit_in_cart=20)
+        self._setDefault(verbosity_level=1)
+
+        # enable kwargs
+        kwargs = self._input_kwargs
+        self.setParams(**kwargs)
+
+    @keyword_only
+    def setParams(
+        self,
+        item_list_col,
+        min_support=0.002,
+        min_confidence=0.2,
+        min_lift=1.2,
+        candidate_count=5,
+        target_item=None,
+        item_col=&#34;item_id&#34;,
+        rec_col=&#34;recommendations&#34;,
+        score_col=&#34;score&#34;,
+        provide_score=False,
+        output_format=&#34;json&#34;,
+        num_limit_in_cart=20,
+        verbosity_level=1,
+    ):
+        kwargs = self._input_kwargs
+        return self._set(**kwargs)
+
+    @logger
+    def _fit(self, df):
+        &#34;&#34;&#34;
+        Fits a model to the input dataset.
+        This is called by the default implementation of fit.
+        Parameters
+        ----------
+        df: pyspark.sql.DataFrame
+            Input transaction dataset with transaction id and shopping list.
+        &#34;&#34;&#34;
+        # prepare params
+        item_list_col = self.getOrDefault(&#34;item_list_col&#34;)
+        min_support = self.getOrDefault(&#34;min_support&#34;)
+        min_confidence = self.getOrDefault(&#34;min_confidence&#34;)
+        min_lift = self.getOrDefault(&#34;min_lift&#34;)
+        candidate_count = self.getOrDefault(&#34;candidate_count&#34;)
+        target_item = self.getOrDefault(&#34;target_item&#34;)
+        item_col = self.getOrDefault(&#34;item_col&#34;)
+        rec_col = self.getOrDefault(&#34;rec_col&#34;)
+        score_col = self.getOrDefault(&#34;score_col&#34;)
+        provide_score = self.getOrDefault(&#34;provide_score&#34;)
+        output_format = self.getOrDefault(&#34;output_format&#34;)
+        num_limit_in_cart = self.getOrDefault(&#34;num_limit_in_cart&#34;)
+        verbosity_level = self.getOrDefault(&#34;verbosity_level&#34;)
+
+        # filter based on num_limit_in_cart.
+        df = df.where(size(col(item_list_col)) &lt;= num_limit_in_cart)
+
+        # apply FP Growth association rule model.
+        fp_growth = FPGrowth(
+            itemsCol=item_list_col, minSupport=min_support, minConfidence=min_confidence
+        )
+        model = fp_growth.fit(df)
+
+        # return model
+        return AssociationRuleModelTransformer(
+            model=model,
+            candidate_count=candidate_count,
+            min_lift=min_lift,
+            target_item=target_item,
+            item_col=item_col,
+            rec_col=rec_col,
+            score_col=score_col,
+            provide_score=provide_score,
+            output_format=output_format,
+            verbosity_level=verbosity_level,
+        )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>pyspark.ml.base.Estimator</li>
+<li>pyspark.ml.param.Params</li>
+<li>pyspark.ml.util.Identifiable</li>
+<li>typing.Generic</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="package_template.models.AssociationRuleModel.candidate_count"><code class="name">var <span class="ident">candidate_count</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="package_template.models.AssociationRuleModel.item_col"><code class="name">var <span class="ident">item_col</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="package_template.models.AssociationRuleModel.item_list_col"><code class="name">var <span class="ident">item_list_col</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="package_template.models.AssociationRuleModel.min_confidence"><code class="name">var <span class="ident">min_confidence</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="package_template.models.AssociationRuleModel.min_lift"><code class="name">var <span class="ident">min_lift</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="package_template.models.AssociationRuleModel.min_support"><code class="name">var <span class="ident">min_support</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="package_template.models.AssociationRuleModel.num_limit_in_cart"><code class="name">var <span class="ident">num_limit_in_cart</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="package_template.models.AssociationRuleModel.output_format"><code class="name">var <span class="ident">output_format</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="package_template.models.AssociationRuleModel.provide_score"><code class="name">var <span class="ident">provide_score</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="package_template.models.AssociationRuleModel.rec_col"><code class="name">var <span class="ident">rec_col</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="package_template.models.AssociationRuleModel.score_col"><code class="name">var <span class="ident">score_col</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="package_template.models.AssociationRuleModel.target_item"><code class="name">var <span class="ident">target_item</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="package_template.models.AssociationRuleModel.verbosity_level"><code class="name">var <span class="ident">verbosity_level</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="package_template.models.AssociationRuleModel.setParams"><code class="name flex">
+<span>def <span class="ident">setParams</span></span>(<span>self, item_list_col, min_support=0.002, min_confidence=0.2, min_lift=1.2, candidate_count=5, target_item=None, item_col='item_id', rec_col='recommendations', score_col='score', provide_score=False, output_format='json', num_limit_in_cart=20, verbosity_level=1)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -44,6 +476,29 @@ hljs.highlightAll();
 <li><h3>Super-module</h3>
 <ul>
 <li><code><a title="package_template" href="../index.html">package_template</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="package_template.models.AssociationRuleModel" href="#package_template.models.AssociationRuleModel">AssociationRuleModel</a></code></h4>
+<ul class="two-column">
+<li><code><a title="package_template.models.AssociationRuleModel.candidate_count" href="#package_template.models.AssociationRuleModel.candidate_count">candidate_count</a></code></li>
+<li><code><a title="package_template.models.AssociationRuleModel.item_col" href="#package_template.models.AssociationRuleModel.item_col">item_col</a></code></li>
+<li><code><a title="package_template.models.AssociationRuleModel.item_list_col" href="#package_template.models.AssociationRuleModel.item_list_col">item_list_col</a></code></li>
+<li><code><a title="package_template.models.AssociationRuleModel.min_confidence" href="#package_template.models.AssociationRuleModel.min_confidence">min_confidence</a></code></li>
+<li><code><a title="package_template.models.AssociationRuleModel.min_lift" href="#package_template.models.AssociationRuleModel.min_lift">min_lift</a></code></li>
+<li><code><a title="package_template.models.AssociationRuleModel.min_support" href="#package_template.models.AssociationRuleModel.min_support">min_support</a></code></li>
+<li><code><a title="package_template.models.AssociationRuleModel.num_limit_in_cart" href="#package_template.models.AssociationRuleModel.num_limit_in_cart">num_limit_in_cart</a></code></li>
+<li><code><a title="package_template.models.AssociationRuleModel.output_format" href="#package_template.models.AssociationRuleModel.output_format">output_format</a></code></li>
+<li><code><a title="package_template.models.AssociationRuleModel.provide_score" href="#package_template.models.AssociationRuleModel.provide_score">provide_score</a></code></li>
+<li><code><a title="package_template.models.AssociationRuleModel.rec_col" href="#package_template.models.AssociationRuleModel.rec_col">rec_col</a></code></li>
+<li><code><a title="package_template.models.AssociationRuleModel.score_col" href="#package_template.models.AssociationRuleModel.score_col">score_col</a></code></li>
+<li><code><a title="package_template.models.AssociationRuleModel.setParams" href="#package_template.models.AssociationRuleModel.setParams">setParams</a></code></li>
+<li><code><a title="package_template.models.AssociationRuleModel.target_item" href="#package_template.models.AssociationRuleModel.target_item">target_item</a></code></li>
+<li><code><a title="package_template.models.AssociationRuleModel.verbosity_level" href="#package_template.models.AssociationRuleModel.verbosity_level">verbosity_level</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

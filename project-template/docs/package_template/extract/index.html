@@ -54,16 +54,16 @@ hljs.highlightAll();
 <dd>The Hadoop data in DataFrame format</dd>
 </dl>
 <h2 id="examples">Examples</h2>
-<pre><code class="language-python-repl">&gt;&gt;&gt; from pyspark.squ import SparkSession
-&gt;&gt;&gt; from package template. extract import spark read
+<pre><code class="language-python-repl">&gt;&gt;&gt; from pyspark.sql import SparkSession
+&gt;&gt;&gt; from package_template.extract import spark_read
 &gt;&gt;&gt; spark = SparkSession.builder.appNameC
 ... &quot;test_spark_write&quot;
 ... ). getorCreate()
-&gt;&gt;&gt; df = spark_read
+&gt;&gt;&gt; df = spark_read(
 ... spark=spark,
 ... file_path=&quot;../../tests/data/test_spark_load_parquet&quot;,
 ... file_format=&quot;parquet&quot;)
-&gt;&gt;&gt; df.show)
+&gt;&gt;&gt; df.show()
 +----+----+
 |col1|col2|
 +----+----+
