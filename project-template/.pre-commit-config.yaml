@@ -1,0 +1,54 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.4.0
+    hooks:
+      - id: check-added-large-files
+        args: ['--maxkb=2000']
+      - id: no-commit-to-branch
+        args: [--branch, master, --branch, dev]
+      - id: check-merge-conflict
+      - id: trailing-whitespace
+
+  - repo: https://github.com/asottile/reorder_python_imports
+    rev: v2.5.0
+    hooks:
+      - id: reorder-python-imports
+
+  - repo: https://github.com/ambv/black
+    rev: 21.4b0
+    hooks:
+      - id: black
+        additional_dependencies: [ 'click==8.0.4' ]
+        language_version: python3.9
+
+  - repo: local
+    hooks:
+      - id: blacken-docs
+        name: blacken-docs
+        description: Run 'black' on python code blocks in documentation files
+        entry: blacken-docs
+        language: system
+        types: [ python ]
+
+  - repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: bash -c 'cd project-template && pylint package_template'
+        language: system
+        types: [ python ]
+        args:
+          - --rcfile=.pylintrc
+          - --output=asset/pylint_report.txt
+
+  - repo: local
+    hooks:
+      - id: pytest-cov
+        name: pytest-cov
+        stage: [commit]
+        args: ["project-template/"]
+        language: system
+        entry: bash -c 'cd project-template && pytest --cov-report term-missing --cov=package_template tests/'
+        types: [ python ]
+        pass_filenames: false
+        always_run: true
