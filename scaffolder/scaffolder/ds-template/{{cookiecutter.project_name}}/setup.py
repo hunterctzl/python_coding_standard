@@ -11,6 +11,7 @@ base = [
     "scikit-learn==0.24.1",
 ]
 dev = [
+    "blacken-docs=1.19.1",
     "pre-commit==2.9.2",
     "pytest==7.2.2",
     "pytest-cov==4.0.0",

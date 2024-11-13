@@ -2,16 +2,15 @@
 Purchase together pipeline in pyspark.
 Covert code in to Pipeline.
 """
-from package_template.preprocessing import ShoppingListTransformer
 from package_template.models import AssociationRuleModel
 from package_template.postprocessing import ScoreNormalization
-from pyspark.ml import Pipeline
+from package_template.preprocessing import ShoppingListTransformer
+from package_template.utils import logger
+from pyspark import keyword_only
 from pyspark.ml import Estimator
+from pyspark.ml import Pipeline
 from pyspark.ml.param import Param
 from pyspark.ml.param import Params
-from pyspark import keyword_only
-
-from package_template.utils import logger
 
 
 class PurchaseTogetherPipeline(Estimator):
@@ -265,7 +264,6 @@ class PurchaseTogetherPipeline(Estimator):
         num_limit_in_cart = self.getOrDefault("num_limit_in_cart")
         verbosity_level = self.getOrDefault("verbosity_level")
 
-
         transformer = ShoppingListTransformer(
             transaction_col=transaction_col,
             item_col=item_col,
@@ -289,9 +287,8 @@ class PurchaseTogetherPipeline(Estimator):
             score_col=score_col,
             output_format=output_format,
             provide_score=provide_score,
-            transformation_method='log',
+            transformation_method="log",
             verbosity_level=verbosity_level,
         )
         # return Pipeline model
         return Pipeline(stages=[transformer, model, score_transformation]).fit(df)
-

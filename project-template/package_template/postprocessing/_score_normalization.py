@@ -3,6 +3,8 @@ This module provides functions to normalize the recommendation score
 """
 import math
 
+from package_template.postprocessing import format_output_result
+from package_template.utils import logger
 from pyspark import keyword_only
 from pyspark.ml import Transformer
 from pyspark.ml.param import Param
@@ -13,9 +15,6 @@ from pyspark.sql.types import FloatType
 from pyspark.sql.types import StringType
 from pyspark.sql.types import StructField
 from pyspark.sql.types import StructType
-
-from package_template.postprocessing import format_output_result
-from package_template.utils import logger
 
 
 class ScoreNormalization(Transformer):

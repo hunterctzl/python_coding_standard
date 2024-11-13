@@ -5,6 +5,7 @@ from package_template.preprocessing import agg_preprocessor
 from package_template.transform import divide_transformer
 from pyspark.sql import DataFrame
 
+
 def pipeline_template(
     data: DataFrame, preprocess_args: dict, transform_args: dict
 ) -> DataFrame:

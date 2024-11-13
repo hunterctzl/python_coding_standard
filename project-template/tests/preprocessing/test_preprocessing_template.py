@@ -6,6 +6,7 @@ import pytest
 from package_template.preprocessing import agg_preprocessor
 from pyspark.sql import SparkSession
 
+
 class TestAggPreprocessor:
     """
     unit tests for preprocessing_template
@@ -36,6 +37,7 @@ class TestAggPreprocessor:
         )
         result = result.toPandas().reset_index(drop=True)
         assert self.expected_df.equals(result)
+
 
 if __name__ == "__main__":
     pytest.main()

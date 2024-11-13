@@ -1,9 +1,8 @@
 import math
 
 import pandas as pd
-from pyspark.sql import SparkSession
-
 from package_template.postprocessing import ScoreNormalization
+from pyspark.sql import SparkSession
 
 
 class TestRemoveSameCategoryItems:

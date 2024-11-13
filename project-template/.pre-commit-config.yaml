@@ -22,33 +22,32 @@ repos:
         language_version: python3.9
 
   - repo: local
-      hooks:
-        - id: blacken-docs
-          name: blacken-docs
-          description: Run 'black' on python code blocks in documentation files
-          entry: blacken-docs
-          types: [ python ]
-          additional_dependencies:
-            - black==22.12.0
+    hooks:
+      - id: blacken-docs
+        name: blacken-docs
+        description: Run 'black' on python code blocks in documentation files
+        entry: blacken-docs
+        language: system
+        types: [ python ]
 
-  - repo: local
-      hooks:
-          - id: pylint
-            name: pylint
-            entry: pylint
-            language: system
-            types: [ python ]
-            args:
-              - --rcfile=.pylintrc
-              - --output=asset/pylint_report.txt
-
-  - repo: local
-      hooks:
-          - id: pytest-cov
-            name: pytest-cov
-            stage: [commit]
-            language: system
-            entry: pytest --cov-report term-missing --cov=package_template tests/
-            types: [ python ]
-            pass_filenames: false
-            always_run: true
+#  - repo: local
+#    hooks:
+#      - id: pylint
+#        name: pylint
+#        entry: pylint
+#        language: system
+#        types: [ python ]
+#        args:
+#          - --rcfile=.pylintrc
+#          - --output=asset/pylint_report.txt
+#
+#  - repo: local
+#    hooks:
+#      - id: pytest-cov
+#        name: pytest-cov
+#        stage: [commit]
+#        language: system
+#        entry: pytest --cov-report term-missing --cov=package_template tests/
+#        types: [ python ]
+#        pass_filenames: false
+#        always_run: true

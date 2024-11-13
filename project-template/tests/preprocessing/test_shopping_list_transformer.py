@@ -3,10 +3,9 @@ Unit Test for Shopping List Transformer.
 """
 import pandas as pd
 import pytest
-from pyspark.sql import SparkSession
-
 from package_template.preprocessing import ShoppingListTransformer
 from package_template.utils import check_log
+from pyspark.sql import SparkSession
 
 
 class TestShoppingListTransformer:
@@ -18,7 +17,9 @@ class TestShoppingListTransformer:
     )
 
     df = spark.createDataFrame(df)
-    pickleRdd = sc.pickleFile("tests/data/test_shopping_list_transformer_result").collect()
+    pickleRdd = sc.pickleFile(
+        "tests/data/test_shopping_list_transformer_result"
+    ).collect()
     target_output = spark.createDataFrame(pickleRdd)
 
     def test_transformer(self):

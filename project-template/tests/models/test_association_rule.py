@@ -3,10 +3,9 @@ Unit Test for Association Rule.
 """
 import pandas as pd
 import pytest
-from pyspark.sql import SparkSession
-
 from package_template.models import AssociationRuleModel
 from package_template.utils import check_log
+from pyspark.sql import SparkSession
 
 
 class TestAssociationRuleRecommender:
@@ -39,14 +38,13 @@ class TestAssociationRuleRecommender:
         #  fit and provide recommendations
         prediction = model.fit(self.df).transform(self.df)
         assert [
-                   {
-                       "item_id": "A",
-                       "recommendations": ["B", "C"],
-                       "score": [1.2000000000000002, 0.8],
-                   },
+            {
+                "item_id": "A",
+                "recommendations": ["B", "C"],
+                "score": [1.2000000000000002, 0.8],
+            },
             {"item_id": "B", "recommendations": ["A"], "score": [1.2]},
             {"item_id": "C", "recommendations": ["A"], "score": [0.7999999999999999]},
-
         ] == prediction, "result not correct."
 
     # case 2: dataframe format
@@ -275,7 +273,6 @@ class TestAssociationRuleRecommender:
             },
             "B": {"recommendations": ["A"], "score": [1.2]},
             "C": {"recommendations": ["A"], "score": [0.7999999999999999]},
-
         }
         assert expected == prediction, "result not correct."
 

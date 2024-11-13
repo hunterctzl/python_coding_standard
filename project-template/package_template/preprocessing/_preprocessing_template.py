@@ -1,8 +1,8 @@
 """
 This module provides a function ds a template to write a preprocessor.
 """
-
 from pyspark.sql import DataFrame
+
 
 def agg_preprocessor(
     data: DataFrame,

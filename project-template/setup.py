@@ -9,6 +9,7 @@ base = [
     "pandas==2.2.3",
 ]
 dev = [
+    "blacken-docs=1.19.1",
     "pre-commit==4.0.1",
     "pytest==8.3.3",
     "pytest-cov==6.0.0",

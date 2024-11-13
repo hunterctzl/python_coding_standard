@@ -24,14 +24,14 @@ From the root of the repo (i.e. if you type 'ls' you should see 'setup.py') run
 
 Usage of the module
 ------------
-Once you install the package using the above command, 
-choose one template from the below available template list, 
+Once you install the package using the above command,
+choose one template from the below available template list,
 and run the following command in terminal
 
 ```nohighlight
 scaffold -t <template_name>>
 ```
-Available template list: 
+Available template list:
 1. ds-template
 
 Template detail:

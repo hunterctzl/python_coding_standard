@@ -1,14 +1,15 @@
 import argparse
+import pathlib
+from os import path
+
 import cookiecutter.main as cmain
 from cookiecutter.exceptions import RepositoryNotFound
-from os import path
-import pathlib
 
 
 def main():
     available_templates = ["ds-template"]
-    parser = argparse.ArgumentParser(prog='scaffold')
-    parser.add_argument('-t', default="ds-template", dest="template")
+    parser = argparse.ArgumentParser(prog="scaffold")
+    parser.add_argument("-t", default="ds-template", dest="template")
     args = parser.parse_args()
     template_to_generate = args.template
     if template_to_generate in available_templates:

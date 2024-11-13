@@ -1,14 +1,14 @@
 """
 This module provides a function as a template to write a reader to extract data.
 """
-
 from pyspark.sql import DataFrame
 from pyspark.sql import SparkSession
 
+
 def spark_read(
-        spark: SparkSession,
-        file_path: str,
-        file_format: str = "parquet",
+    spark: SparkSession,
+    file_path: str,
+    file_format: str = "parquet",
 ) -> DataFrame:
     """A function to read different Hadoop formats data into pyspark DataFrame
 

@@ -2,13 +2,12 @@
 Shopping List Transformer
 Transform the input dataset to the format that FP Growth accept.
 """
+from package_template.utils import logger
 from pyspark import keyword_only
 from pyspark.ml import Transformer
 from pyspark.ml.param import Param
 from pyspark.ml.param import Params
 from pyspark.sql import functions as f
-
-from package_template.utils import logger
 
 
 class ShoppingListTransformer(Transformer):

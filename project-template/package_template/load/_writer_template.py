@@ -3,11 +3,9 @@ This module provides a function as a template to write a writer to load data.
 """
 from pyspark.sql import DataFrame
 
+
 def spark_write(
-        data: DataFrame,
-        file_path: str,
-        file_format: str = "parquet",
-        mode: str ="append"
+    data: DataFrame, file_path: str, file_format: str = "parquet", mode: str = "append"
 ):
     """A function to write pyspark DataFrame into Hadoop
     Parameters

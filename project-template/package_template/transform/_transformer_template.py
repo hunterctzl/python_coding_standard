@@ -4,11 +4,9 @@ This module provides a function as a template to write a transformer.
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as f
 
+
 def divide_transformer(
-    data: DataFrame,
-    numerator_col: str,
-    denominator_col: str,
-    result_col: str
+    data: DataFrame, numerator_col: str, denominator_col: str, result_col: str
 ) -> DataFrame:
     """Main function to transform auditlog records
 
@@ -51,5 +49,5 @@ def divide_transformer(
     +-----+---+-----+-----+
     """
 
-    result = data.withColumn(result_col, f.col(numerator_col) / f.col (denominator_col))
+    result = data.withColumn(result_col, f.col(numerator_col) / f.col(denominator_col))
     return result

@@ -2,10 +2,12 @@
 unit tests for writer_template
 """
 import shutil
+
 import pytest
 from package_template.load import spark_write
 from pandas import DataFrame
 from pyspark.sql import SparkSession
+
 
 class TestSparkWriter:
     """
@@ -41,6 +43,7 @@ class TestSparkWriter:
         result_df = result_df.toPandas().sort_values("col1").reset_index(drop=True)
         shutil.rmtree("tests/data/test_spark_write_parquet")
         assert self.expected_df.equals(result_df)
+
 
 if __name__ == "__main__":
     pytest.main()

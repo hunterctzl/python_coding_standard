@@ -1,12 +1,13 @@
 """
 unit tests for reader_template
 """
-
 import os
+
 import pytest
 from package_template.extract import spark_read
 from pandas import DataFrame
 from pyspark.sql import SparkSession
+
 
 class TestSparkReader:
     """
@@ -30,6 +31,7 @@ class TestSparkReader:
         )
         df = df.toPandas().sort_values("col1").reset_index(drop=True)
         assert self.expected_df.equals(df)
+
     def test_parquet_error(self):
         e = spark_read(
             spark=self.spark,
@@ -37,11 +39,16 @@ class TestSparkReader:
             file_format="parquet",
         )
 
-        dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data'))
-        expected_result = ("Error reading file from tests/data/test_spark_load_parquet2 "
+        dir_path = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "data")
+        )
+        expected_result = (
+            "Error reading file from tests/data/test_spark_load_parquet2 "
             "proceeding with error: [PATH_NOT_FOUND] Path does not exist: "
-            f"file:{dir_path}/test_spark_load_parquet2.")
-        assert (e == expected_result)
+            f"file:{dir_path}/test_spark_load_parquet2."
+        )
+        assert e == expected_result
+
 
 if __name__ == "__main__":
     pytest.main()
