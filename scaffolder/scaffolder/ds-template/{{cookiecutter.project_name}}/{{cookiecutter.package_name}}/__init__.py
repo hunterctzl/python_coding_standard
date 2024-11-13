@@ -1,3 +1,3 @@
 """
-This is the Michaels ds-template repo.
+This is the ds-template repo.
 """
