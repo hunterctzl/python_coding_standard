@@ -1,3 +1,6 @@
+"""
+This module provide functions to generate logs
+"""
 import json
 import logging
 import os
@@ -76,6 +79,10 @@ def logger(func):
 
 
 class OutputLogger(object):
+    """
+    Define an object to log messages.
+    """
+
     def __init__(self, logger, log_level=logging.INFO):
         self.logger = logger
         self.log_level = log_level
@@ -114,11 +121,9 @@ def log_exception(
     # Extract unformatter stack traces as tuples
     trace_back = traceback.extract_tb(ex_traceback)
     # Format stacktrace
-    stack_trace = "File : %s , Line : %d, Func.Name : %s, Message : %s" % (
-        trace_back[-1][0],
-        trace_back[-1][1],
-        trace_back[-1][2],
-        trace_back[-1][3],
+    stack_trace = (
+        f"File : {trace_back[-1][0]} , Line : {trace_back[-1][1]}, "
+        f"Func.Name : {trace_back[-1][2]}, Message : {trace_back[-1][3]}"
     )
     exception_log = {}
     exception_log["message"] = message

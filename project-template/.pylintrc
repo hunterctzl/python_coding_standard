@@ -129,6 +129,12 @@ disable=R,
         wrong-import-order,
         xrange-builtin,
         zip-builtin-not-iterating,
+        W0212,
+        W0613,
+        W0237,
+        W0621,
+        W1514,
+        C0103,
 
 
 [REPORTS]
@@ -238,7 +244,7 @@ generated-members=
 [FORMAT]
 
 # Maximum number of characters on a single line.
-max-line-length=89
+max-line-length=100
 
 # TODO(https://github.com/pylint-dev/pylint/issues/3352): Direct pylint to exempt
 # lines made too long by directives to pytype.

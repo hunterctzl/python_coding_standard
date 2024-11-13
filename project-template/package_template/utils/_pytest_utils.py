@@ -1,3 +1,6 @@
+"""
+This module provide a function to test logging functions
+"""
 import os
 
 

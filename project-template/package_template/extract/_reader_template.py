@@ -3,6 +3,7 @@ This module provides a function as a template to write a reader to extract data.
 """
 from pyspark.sql import DataFrame
 from pyspark.sql import SparkSession
+from pyspark.sql.utils import AnalysisException
 
 
 def spark_read(
@@ -49,7 +50,6 @@ def spark_read(
     assert isinstance(spark, SparkSession), "df must be SparkSession"
     assert isinstance(file_path, str), "file_path must be str"
     assert isinstance(file_format, str), "file_format must be str"
-    from pyspark.sql.utils import AnalysisException
 
     try:
         return spark.read.format(file_format).load(file_path)
